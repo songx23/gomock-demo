@@ -5,14 +5,15 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	mockclient "gomock-showcase/internal/server/mocks"
+
+	mockclient "gomock-showcase/test/mocks/magic"
 )
 
-func newSentientMock(t *testing.T) downstreamClient {
+func newSentientMock(t *testing.T) Client {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
-	c := mockclient.NewMockdownstreamClient(ctrl)
+	c := mockclient.NewMockClient(ctrl)
 
 	c.EXPECT().Magic(gomock.Eq("anything1")).Return("", errors.New("things are on fire")).AnyTimes()
 	c.EXPECT().Magic(gomock.Eq("anything2")).Return("Queen of Hearts", nil).AnyTimes()
@@ -24,7 +25,7 @@ func newSentientMock(t *testing.T) downstreamClient {
 func TestServer_OnFire_Inline(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type fields struct {
-		magicClient downstreamClient
+		magicClient Client
 	}
 	type args struct {
 		something string
@@ -39,8 +40,8 @@ func TestServer_OnFire_Inline(t *testing.T) {
 		{
 			name: "on fire",
 			fields: fields{
-				magicClient: func() downstreamClient {
-					c := mockclient.NewMockdownstreamClient(ctrl)
+				magicClient: func() Client {
+					c := mockclient.NewMockClient(ctrl)
 					c.EXPECT().Magic(gomock.Any()).Return("", errors.New("things are on fire")).Times(1)
 					return c
 				}(),
@@ -54,8 +55,8 @@ func TestServer_OnFire_Inline(t *testing.T) {
 		{
 			name: "magic well done",
 			fields: fields{
-				magicClient: func() downstreamClient {
-					c := mockclient.NewMockdownstreamClient(ctrl)
+				magicClient: func() Client {
+					c := mockclient.NewMockClient(ctrl)
 					c.EXPECT().Magic(gomock.Any()).Return("Queen of Hearts", nil).Times(1)
 					return c
 				}(),
@@ -69,8 +70,8 @@ func TestServer_OnFire_Inline(t *testing.T) {
 		{
 			name: "magic failed",
 			fields: fields{
-				magicClient: func() downstreamClient {
-					c := mockclient.NewMockdownstreamClient(ctrl)
+				magicClient: func() Client {
+					c := mockclient.NewMockClient(ctrl)
 					c.EXPECT().Magic(gomock.Any()).Return("King of Spades", nil).Times(1)
 					return c
 				}(),
@@ -84,8 +85,8 @@ func TestServer_OnFire_Inline(t *testing.T) {
 		{
 			name: "nothing's work but everything is fine",
 			fields: fields{
-				magicClient: func() downstreamClient {
-					c := mockclient.NewMockdownstreamClient(ctrl)
+				magicClient: func() Client {
+					c := mockclient.NewMockClient(ctrl)
 					c.EXPECT().Magic(gomock.Any()).Return("Oops", nil).Times(1)
 					return c
 				}(),
@@ -117,7 +118,7 @@ func TestServer_OnFire_Inline(t *testing.T) {
 func TestServer_OnFire_Stub(t *testing.T) {
 	stub := newSentientMock(t)
 	type fields struct {
-		magicClient downstreamClient
+		magicClient Client
 	}
 	type args struct {
 		something string

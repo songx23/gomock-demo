@@ -1,15 +1,15 @@
 package server
 
 type Server struct {
-	magicClient downstreamClient
+	magicClient Client
 }
 
-//go:generate mockgen -source=server.go -destination=./mocks/client.go -package=mock_client
-type downstreamClient interface {
+//go:generate mockgen -source=server.go -destination=../../test/mocks/magic/client.go -package=mock_magic
+type Client interface {
 	Magic(string) (string, error)
 }
 
-func NewServer(c downstreamClient) *Server {
+func NewServer(c Client) *Server {
 	return &Server{
 		magicClient: c,
 	}

@@ -1,4 +1,4 @@
-package client
+package magic
 
 import (
 	"fmt"
@@ -27,13 +27,22 @@ func (c *Client) Magic(something string) (string, error) {
 		return "", err
 	}
 	res, err := c.httpClient.Do(r)
-	defer res.Body.Close()
 	if err != nil {
 		return "", err
 	}
+	defer res.Body.Close()
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return "", err
 	}
 	return string(b), nil
+}
+
+func (*Client) DarkMagic(name string) string {
+	switch name {
+	case "Harry Porter":
+		return "Owl"
+	default:
+		return "Mouse"
+	}
 }
